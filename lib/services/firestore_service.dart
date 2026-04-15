@@ -1,20 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../models/announcement_model.dart';
-import '../models/admin_model.dart';
-import '../models/analytics_model.dart';
-import '../models/chat_message_model.dart';
-import '../models/chat_thread_model.dart';
-import '../models/event_model.dart';
-import '../models/forum_model.dart';
-import '../models/job_model.dart';
-import '../models/mentorship_model.dart';
-import '../models/resource_model.dart';
-import '../models/user_model.dart';
+import '../core/models/user_model.dart';
+import '../features/admin/domain/admin_model.dart';
+import '../features/analytics/domain/analytics_model.dart';
+import '../features/announcements/domain/announcement_model.dart';
+import '../features/chat/domain/chat_message_model.dart';
+import '../features/chat/domain/chat_thread_model.dart';
+import '../features/events/domain/event_model.dart';
+import '../features/forum/domain/forum_model.dart';
+import '../features/jobs/domain/job_model.dart';
+import '../features/mentorship/domain/mentorship_model.dart';
+import '../features/resources/domain/resource_model.dart';
 
 class FirestoreService {
   FirestoreService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -100,7 +100,9 @@ class FirestoreService {
   }
 
   Stream<List<AppUser>> watchAlumniUsers() {
-    return _users.where('userType', isEqualTo: 'alumni').snapshots().map((snap) {
+    return _users.where('userType', isEqualTo: 'alumni').snapshots().map((
+      snap,
+    ) {
       final users = snap.docs.map(AppUser.fromDoc).toList();
       users.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return users;
@@ -166,13 +168,13 @@ class FirestoreService {
   }
 
   Stream<List<ChatThread>> watchUserChats(String uid) {
-    return _chats.where('participants', arrayContains: uid).snapshots().map(
-      (snap) {
-        final threads = snap.docs.map(ChatThread.fromDoc).toList();
-        threads.sort((a, b) => b.lastMessageAt.compareTo(a.lastMessageAt));
-        return threads;
-      },
-    );
+    return _chats.where('participants', arrayContains: uid).snapshots().map((
+      snap,
+    ) {
+      final threads = snap.docs.map(ChatThread.fromDoc).toList();
+      threads.sort((a, b) => b.lastMessageAt.compareTo(a.lastMessageAt));
+      return threads;
+    });
   }
 
   Stream<List<ChatMessage>> watchChatMessages(String chatId) {
@@ -182,8 +184,8 @@ class FirestoreService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snap) {
-      return snap.docs.map(ChatMessage.fromDoc).toList();
-    });
+          return snap.docs.map(ChatMessage.fromDoc).toList();
+        });
   }
 
   Future<void> sendChatMessage({
@@ -191,23 +193,18 @@ class FirestoreService {
     required String senderId,
     required String text,
   }) async {
-    await _chats.doc(chatId).collection('messages').add(
-          {
-            'senderId': senderId,
-            'text': text,
-            'createdAt': FieldValue.serverTimestamp(),
-          },
-        );
+    await _chats.doc(chatId).collection('messages').add({
+      'senderId': senderId,
+      'text': text,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
 
-    await _chats.doc(chatId).set(
-      {
-        'updatedAt': FieldValue.serverTimestamp(),
-        'lastMessage': text,
-        'lastSenderId': senderId,
-        'lastMessageAt': FieldValue.serverTimestamp(),
-      },
-      SetOptions(merge: true),
-    );
+    await _chats.doc(chatId).set({
+      'updatedAt': FieldValue.serverTimestamp(),
+      'lastMessage': text,
+      'lastSenderId': senderId,
+      'lastMessageAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   // Mentorship Methods
@@ -216,42 +213,62 @@ class FirestoreService {
   }
 
   Stream<List<MentorshipSlot>> watchMentorshipSlots() {
-    return _mentorshipSlots
-        .where('isActive', isEqualTo: true)
-        .snapshots()
-        .map((snap) {
-      final slots = snap.docs.map((doc) => MentorshipSlot.fromMap(doc.data(), doc.id)).toList();
+    return _mentorshipSlots.where('isActive', isEqualTo: true).snapshots().map((
+      snap,
+    ) {
+      final slots = snap.docs
+          .map((doc) => MentorshipSlot.fromMap(doc.data(), doc.id))
+          .toList();
       slots.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return slots;
     });
   }
 
   Stream<List<MentorshipSlot>> watchMyMentorshipSlots(String mentorId) {
-    return _mentorshipSlots.where('mentorId', isEqualTo: mentorId).snapshots().map((snap) {
-      final slots = snap.docs.map((doc) => MentorshipSlot.fromMap(doc.data(), doc.id)).toList();
-      slots.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return slots;
-    });
+    return _mentorshipSlots
+        .where('mentorId', isEqualTo: mentorId)
+        .snapshots()
+        .map((snap) {
+          final slots = snap.docs
+              .map((doc) => MentorshipSlot.fromMap(doc.data(), doc.id))
+              .toList();
+          slots.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return slots;
+        });
   }
 
   Future<void> createMentorshipRequest(MentorshipRequest request) async {
     await _mentorshipRequests.add(request.toMap());
   }
 
-  Stream<List<MentorshipRequest>> watchMentorshipRequestsForMentor(String mentorId) {
-    return _mentorshipRequests.where('mentorId', isEqualTo: mentorId).snapshots().map((snap) {
-      final requests = snap.docs.map((doc) => MentorshipRequest.fromMap(doc.data(), doc.id)).toList();
-      requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return requests;
-    });
+  Stream<List<MentorshipRequest>> watchMentorshipRequestsForMentor(
+    String mentorId,
+  ) {
+    return _mentorshipRequests
+        .where('mentorId', isEqualTo: mentorId)
+        .snapshots()
+        .map((snap) {
+          final requests = snap.docs
+              .map((doc) => MentorshipRequest.fromMap(doc.data(), doc.id))
+              .toList();
+          requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return requests;
+        });
   }
 
-  Stream<List<MentorshipRequest>> watchMentorshipRequestsForMentee(String menteeId) {
-    return _mentorshipRequests.where('menteeId', isEqualTo: menteeId).snapshots().map((snap) {
-      final requests = snap.docs.map((doc) => MentorshipRequest.fromMap(doc.data(), doc.id)).toList();
-      requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return requests;
-    });
+  Stream<List<MentorshipRequest>> watchMentorshipRequestsForMentee(
+    String menteeId,
+  ) {
+    return _mentorshipRequests
+        .where('menteeId', isEqualTo: menteeId)
+        .snapshots()
+        .map((snap) {
+          final requests = snap.docs
+              .map((doc) => MentorshipRequest.fromMap(doc.data(), doc.id))
+              .toList();
+          requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return requests;
+        });
   }
 
   Future<void> updateMentorshipRequest(String requestId, String status) async {
@@ -270,13 +287,19 @@ class FirestoreService {
         .where('mentorId', isEqualTo: userId)
         .snapshots()
         .map((snap) {
-      final sessions = snap.docs.map((doc) => MentorshipSession.fromMap(doc.data(), doc.id)).toList();
-      sessions.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
-      return sessions;
-    });
+          final sessions = snap.docs
+              .map((doc) => MentorshipSession.fromMap(doc.data(), doc.id))
+              .toList();
+          sessions.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
+          return sessions;
+        });
   }
 
-  Future<void> updateMentorshipSession(String sessionId, String status, String notes) async {
+  Future<void> updateMentorshipSession(
+    String sessionId,
+    String status,
+    String notes,
+  ) async {
     await _mentorshipSessions.doc(sessionId).update({
       'status': status,
       'notes': notes,
@@ -290,29 +313,43 @@ class FirestoreService {
 
   Stream<List<ForumPost>> watchForumPosts() {
     return _forumPosts.snapshots().map((snap) {
-      final posts = snap.docs.map((doc) => ForumPost.fromMap(doc.data(), doc.id)).toList();
+      final posts = snap.docs
+          .map((doc) => ForumPost.fromMap(doc.data(), doc.id))
+          .toList();
       posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return posts;
     });
   }
 
   Stream<List<ForumPost>> watchForumPostsByCategory(String category) {
-    return _forumPosts.where('category', isEqualTo: category).snapshots().map((snap) {
-      final posts = snap.docs.map((doc) => ForumPost.fromMap(doc.data(), doc.id)).toList();
+    return _forumPosts.where('category', isEqualTo: category).snapshots().map((
+      snap,
+    ) {
+      final posts = snap.docs
+          .map((doc) => ForumPost.fromMap(doc.data(), doc.id))
+          .toList();
       posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return posts;
     });
   }
 
   Stream<List<ForumPost>> watchMyForumPosts(String userId) {
-    return _forumPosts.where('authorId', isEqualTo: userId).snapshots().map((snap) {
-      final posts = snap.docs.map((doc) => ForumPost.fromMap(doc.data(), doc.id)).toList();
+    return _forumPosts.where('authorId', isEqualTo: userId).snapshots().map((
+      snap,
+    ) {
+      final posts = snap.docs
+          .map((doc) => ForumPost.fromMap(doc.data(), doc.id))
+          .toList();
       posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return posts;
     });
   }
 
-  Future<void> likeForumPost(String postId, String userId, List<String> likedBy) async {
+  Future<void> likeForumPost(
+    String postId,
+    String userId,
+    List<String> likedBy,
+  ) async {
     await _forumPosts.doc(postId).update({
       'likedBy': likedBy,
       'likeCount': likedBy.length,
@@ -320,9 +357,7 @@ class FirestoreService {
   }
 
   Future<void> incrementForumPostViews(String postId) async {
-    await _forumPosts.doc(postId).update({
-      'views': FieldValue.increment(1),
-    });
+    await _forumPosts.doc(postId).update({'views': FieldValue.increment(1)});
   }
 
   Future<void> createForumComment(ForumComment comment) async {
@@ -333,8 +368,12 @@ class FirestoreService {
   }
 
   Stream<List<ForumComment>> watchForumComments(String postId) {
-    return _forumComments.where('postId', isEqualTo: postId).snapshots().map((snap) {
-      final comments = snap.docs.map((doc) => ForumComment.fromMap(doc.data(), doc.id)).toList();
+    return _forumComments.where('postId', isEqualTo: postId).snapshots().map((
+      snap,
+    ) {
+      final comments = snap.docs
+          .map((doc) => ForumComment.fromMap(doc.data(), doc.id))
+          .toList();
       comments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
       return comments;
     });
@@ -346,7 +385,9 @@ class FirestoreService {
 
   Stream<List<ForumCategory>> watchForumCategories() {
     return _forumCategories.snapshots().map((snap) {
-      final categories = snap.docs.map((doc) => ForumCategory.fromMap(doc.data(), doc.id)).toList();
+      final categories = snap.docs
+          .map((doc) => ForumCategory.fromMap(doc.data(), doc.id))
+          .toList();
       categories.sort((a, b) => b.postCount.compareTo(a.postCount));
       return categories;
     });
@@ -359,23 +400,33 @@ class FirestoreService {
 
   Stream<List<Resource>> watchResources() {
     return _resources.snapshots().map((snap) {
-      final resources = snap.docs.map((doc) => Resource.fromMap(doc.data(), doc.id)).toList();
+      final resources = snap.docs
+          .map((doc) => Resource.fromMap(doc.data(), doc.id))
+          .toList();
       resources.sort((a, b) => b.rating.compareTo(a.rating));
       return resources;
     });
   }
 
   Stream<List<Resource>> watchResourcesByCategory(String category) {
-    return _resources.where('category', isEqualTo: category).snapshots().map((snap) {
-      final resources = snap.docs.map((doc) => Resource.fromMap(doc.data(), doc.id)).toList();
+    return _resources.where('category', isEqualTo: category).snapshots().map((
+      snap,
+    ) {
+      final resources = snap.docs
+          .map((doc) => Resource.fromMap(doc.data(), doc.id))
+          .toList();
       resources.sort((a, b) => b.rating.compareTo(a.rating));
       return resources;
     });
   }
 
   Stream<List<Resource>> watchMyResources(String authorId) {
-    return _resources.where('authorId', isEqualTo: authorId).snapshots().map((snap) {
-      final resources = snap.docs.map((doc) => Resource.fromMap(doc.data(), doc.id)).toList();
+    return _resources.where('authorId', isEqualTo: authorId).snapshots().map((
+      snap,
+    ) {
+      final resources = snap.docs
+          .map((doc) => Resource.fromMap(doc.data(), doc.id))
+          .toList();
       resources.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return resources;
     });
@@ -399,22 +450,29 @@ class FirestoreService {
   }
 
   Stream<List<ResourceReview>> watchResourceReviews(String resourceId) {
-    return _resourceReviews.where('resourceId', isEqualTo: resourceId).snapshots().map((snap) {
-      final reviews = snap.docs.map((doc) => ResourceReview.fromMap(doc.data(), doc.id)).toList();
-      reviews.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return reviews;
-    });
+    return _resourceReviews
+        .where('resourceId', isEqualTo: resourceId)
+        .snapshots()
+        .map((snap) {
+          final reviews = snap.docs
+              .map((doc) => ResourceReview.fromMap(doc.data(), doc.id))
+              .toList();
+          reviews.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return reviews;
+        });
   }
 
   Future<void> _updateResourceRating(String resourceId) async {
-    final reviews = await _resourceReviews.where('resourceId', isEqualTo: resourceId).get();
+    final reviews = await _resourceReviews
+        .where('resourceId', isEqualTo: resourceId)
+        .get();
     if (reviews.docs.isEmpty) return;
 
     // final totalRating = reviews.docs.fold<int>(0, (sum, doc) => sum + (doc.data()['rating'] ?? 0));
     final totalRating = reviews.docs.fold<int>(0, (sum, doc) {
-  final rating = doc.data()['rating'];
-  return sum + (rating is num ? rating.toInt() : 0);
-});
+      final rating = doc.data()['rating'];
+      return sum + (rating is num ? rating.toInt() : 0);
+    });
     final avgRating = totalRating / reviews.docs.length;
 
     await _resources.doc(resourceId).update({
@@ -429,7 +487,9 @@ class FirestoreService {
 
   Stream<List<ResourceCategory>> watchResourceCategories() {
     return _resourceCategories.snapshots().map((snap) {
-      final categories = snap.docs.map((doc) => ResourceCategory.fromMap(doc.data(), doc.id)).toList();
+      final categories = snap.docs
+          .map((doc) => ResourceCategory.fromMap(doc.data(), doc.id))
+          .toList();
       categories.sort((a, b) => b.resourceCount.compareTo(a.resourceCount));
       return categories;
     });
@@ -452,14 +512,23 @@ class FirestoreService {
   }
 
   Stream<List<ContentModerationItem>> watchContentModeration() {
-    return _contentModeration.where('status', isEqualTo: 'pending').snapshots().map((snap) {
-      final items = snap.docs.map((doc) => ContentModerationItem.fromMap(doc.data(), doc.id)).toList();
-      items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return items;
-    });
+    return _contentModeration
+        .where('status', isEqualTo: 'pending')
+        .snapshots()
+        .map((snap) {
+          final items = snap.docs
+              .map((doc) => ContentModerationItem.fromMap(doc.data(), doc.id))
+              .toList();
+          items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return items;
+        });
   }
 
-  Future<void> updateContentModerationItem(String itemId, String status, String? adminNotes) async {
+  Future<void> updateContentModerationItem(
+    String itemId,
+    String status,
+    String? adminNotes,
+  ) async {
     await _contentModeration.doc(itemId).update({
       'status': status,
       'adminNotes': adminNotes,
@@ -472,14 +541,22 @@ class FirestoreService {
   }
 
   Stream<List<UserReport>> watchUserReports() {
-    return _userReports.where('status', isEqualTo: 'pending').snapshots().map((snap) {
-      final reports = snap.docs.map((doc) => UserReport.fromMap(doc.data(), doc.id)).toList();
+    return _userReports.where('status', isEqualTo: 'pending').snapshots().map((
+      snap,
+    ) {
+      final reports = snap.docs
+          .map((doc) => UserReport.fromMap(doc.data(), doc.id))
+          .toList();
       reports.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       return reports;
     });
   }
 
-  Future<void> updateUserReport(String reportId, String status, String? actionTaken) async {
+  Future<void> updateUserReport(
+    String reportId,
+    String status,
+    String? actionTaken,
+  ) async {
     await _userReports.doc(reportId).update({
       'status': status,
       'actionTaken': actionTaken,
@@ -488,7 +565,11 @@ class FirestoreService {
   }
 
   // Analytics Methods
-  Future<void> trackContentView(String contentId, String contentType, String authorId) async {
+  Future<void> trackContentView(
+    String contentId,
+    String contentType,
+    String authorId,
+  ) async {
     final today = DateTime.now();
     final dateKey = '${today.year}-${today.month}-${today.day}';
 
@@ -502,7 +583,11 @@ class FirestoreService {
     });
   }
 
-  Future<void> trackContentClick(String contentId, String contentType, String authorId) async {
+  Future<void> trackContentClick(
+    String contentId,
+    String contentType,
+    String authorId,
+  ) async {
     final today = DateTime.now();
     final dateKey = '${today.year}-${today.month}-${today.day}';
 
@@ -516,7 +601,12 @@ class FirestoreService {
     });
   }
 
-  Future<void> updateEngagementMetrics(String userId, String userName, String userType, String action) async {
+  Future<void> updateEngagementMetrics(
+    String userId,
+    String userName,
+    String userType,
+    String action,
+  ) async {
     final ref = _engagementMetrics.doc(userId);
     final existing = await ref.get();
 
@@ -577,7 +667,9 @@ class FirestoreService {
 
   Stream<List<EngagementMetrics>> watchTopEngagedUsers() {
     return _engagementMetrics.snapshots().map((snap) {
-      final metrics = snap.docs.map((doc) => EngagementMetrics.fromMap(doc.data()!)).toList();
+      final metrics = snap.docs
+          .map((doc) => EngagementMetrics.fromMap(doc.data()!))
+          .toList();
       metrics.sort((a, b) => b.engagementScore.compareTo(a.engagementScore));
       return metrics.take(10).toList();
     });
