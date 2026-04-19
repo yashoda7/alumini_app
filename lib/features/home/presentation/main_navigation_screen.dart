@@ -21,28 +21,12 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider).value;
     
-    if (user == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
-    final List<Widget> screens = [
-      user.isAlumni ? const AlumniHomeScreen() : const StudentHomeScreen(),
-      const EventListScreen(canCreate: false), // Simplified for now, or use role specific
-      const ProfileScreen(),
-    ];
-
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ),
-      extendBody: true,
-      bottomNavigationBar: PremiumBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
+    return user.isAlumni ? const AlumniHomeScreen() : const StudentHomeScreen();
   }
 }

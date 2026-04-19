@@ -25,7 +25,7 @@ class AuthNotifier extends AsyncNotifier<void> {
     required String department,
     required String year,
     String? areaOfInterest,
-    String? presentTechnologies,
+    String? bio,
     String? yearsOfExperience,
   }) async {
     state = const AsyncLoading();
@@ -36,7 +36,7 @@ class AuthNotifier extends AsyncNotifier<void> {
             department: department,
             year: year,
             areaOfInterest: areaOfInterest,
-            presentTechnologies: presentTechnologies,
+            bio: bio,
             yearsOfExperience: yearsOfExperience,
           ),
     );

@@ -674,4 +674,47 @@ class FirestoreService {
       return metrics.take(10).toList();
     });
   }
+
+  Stream<EngagementMetrics?> watchUserEngagementMetrics(String userId) {
+    return _engagementMetrics.doc(userId).snapshots().map((doc) {
+      if (!doc.exists || doc.data() == null) return null;
+      return EngagementMetrics.fromMap(doc.data()!);
+    });
+  }
+
+  // User-specific activity count streams
+  Stream<int> watchUserJobCount(String userId) {
+    return _jobs
+        .where('createdBy', isEqualTo: userId)
+        .snapshots()
+        .map((s) => s.docs.length);
+  }
+
+  Stream<int> watchUserEventCount(String userId) {
+    return _events
+        .where('createdBy', isEqualTo: userId)
+        .snapshots()
+        .map((s) => s.docs.length);
+  }
+
+  Stream<int> watchUserAnnouncementCount(String userId) {
+    return _announcements
+        .where('createdBy', isEqualTo: userId)
+        .snapshots()
+        .map((s) => s.docs.length);
+  }
+
+  Stream<int> watchUserForumPostCount(String userId) {
+    return _forumPosts
+        .where('authorId', isEqualTo: userId)
+        .snapshots()
+        .map((s) => s.docs.length);
+  }
+
+  Stream<int> watchUserForumCommentCount(String userId) {
+    return _forumComments
+        .where('authorId', isEqualTo: userId)
+        .snapshots()
+        .map((s) => s.docs.length);
+  }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/premium_dashboard_widgets.dart';
 import 'providers/auth_notifier.dart';
 
@@ -24,7 +23,7 @@ class _ProfileCompletionScreenState
   String? _department;
   String? _year;
   String? _areaOfInterest;
-  String? _presentTechnologies;
+  String? _bio;
   String? _yearsOfExperience;
 
   Future<void> _submit() async {
@@ -37,7 +36,7 @@ class _ProfileCompletionScreenState
           department: _department ?? '',
           year: _year ?? '',
           areaOfInterest: _areaOfInterest,
-          presentTechnologies: _presentTechnologies,
+          bio: _bio,
           yearsOfExperience: _yearsOfExperience,
         );
   }
@@ -215,13 +214,15 @@ class _ProfileCompletionScreenState
                       delay: const Duration(milliseconds: 700),
                       child: TextFormField(
                         decoration: _inputDecoration(
-                          label: 'Present Technologies',
-                          icon: Icons.computer_outlined,
-                        ),
+                          label: 'Bio',
+                          icon: Icons.info_outline_rounded,
+                        ).copyWith(alignLabelWithHint: true),
                         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                        textCapitalization: TextCapitalization.words,
+                        textCapitalization: TextCapitalization.sentences,
+                        maxLines: 4,
+                        minLines: 3,
                         validator: (v) => (v?.trim().isEmpty ?? true) ? 'Required' : null,
-                        onSaved: (v) => _presentTechnologies = v!.trim(),
+                        onSaved: (v) => _bio = v!.trim(),
                       ),
                     ),
                     const SizedBox(height: 24),

@@ -62,28 +62,28 @@ class AnnouncementListScreen extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    showDragHandle: true,
-                    builder: (ctx) {
-                      return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              a.title,
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(a.message),
-                            const SizedBox(height: 12),
-                          ],
-                        ),
-                      );
-                    },
-                  );
+                  // showModalBottomSheet(
+                  //   context: context,
+                  //   showDragHandle: true,
+                  //   builder: (ctx) {
+                  //     return Padding(
+                  //       padding: const EdgeInsets.all(16),
+                  //       child: Column(
+                  //         mainAxisSize: MainAxisSize.min,
+                  //         crossAxisAlignment: CrossAxisAlignment.start,
+                  //         children: [
+                  //           Text(
+                  //             a.title,
+                  //             style: Theme.of(context).textTheme.titleLarge,
+                  //           ),
+                  //           const SizedBox(height: 12),
+                  //           Text(a.message),
+                  //           const SizedBox(height: 12),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // );
                 },
               );
             },

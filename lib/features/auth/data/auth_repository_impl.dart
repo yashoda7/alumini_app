@@ -48,7 +48,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String department,
     required String year,
     String? areaOfInterest,
-    String? presentTechnologies,
+    String? bio,
     String? yearsOfExperience,
   }) =>
       _firestore.updateUserProfileFields(uid, {
@@ -56,7 +56,7 @@ class AuthRepositoryImpl implements AuthRepository {
         'department': department,
         'year': year,
         if (areaOfInterest != null) 'areaOfInterest': areaOfInterest,
-        if (presentTechnologies != null) 'presentTechnologies': presentTechnologies,
+        if (bio != null) 'bio': bio,
         if (yearsOfExperience != null) 'yearsOfExperience': yearsOfExperience,
         'isProfileComplete': true,
       });

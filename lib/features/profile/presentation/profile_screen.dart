@@ -18,7 +18,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late String _department;
   late String _year;
   String? _areaOfInterest;
-  String? _presentTechnologies;
+  String? _bio;
   String? _yearsOfExperience;
 
   bool _saving = false;
@@ -31,7 +31,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _department = user?.department ?? '';
     _year = user?.year ?? '';
     _areaOfInterest = user?.areaOfInterest;
-    _presentTechnologies = user?.presentTechnologies;
+    _bio = user?.bio;
     _yearsOfExperience = user?.yearsOfExperience;
   }
 
@@ -53,7 +53,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           'department': _department,
           'year': _year,
           if (_areaOfInterest != null) 'areaOfInterest': _areaOfInterest,
-          if (_presentTechnologies != null) 'presentTechnologies': _presentTechnologies,
+          if (_bio != null) 'bio': _bio,
           if (_yearsOfExperience != null) 'yearsOfExperience': _yearsOfExperience,
         },
       );
@@ -217,10 +217,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           ),
                           const SizedBox(height: 20),
                           _buildInputField(
-                            label: 'Present Technologies',
-                            initialValue: _presentTechnologies ?? '',
-                            icon: Icons.computer_outlined,
-                            onSaved: (v) => _presentTechnologies = v!.trim(),
+                            label: 'Bio',
+                            initialValue: _bio ?? '',
+                            icon: Icons.info_outline_rounded,
+                            maxLines: 4,
+                            onSaved: (v) => _bio = v!.trim(),
                             validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                           ),
                           const SizedBox(height: 20),
@@ -267,12 +268,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     required IconData icon,
     required FormFieldSetter<String> onSaved,
     required FormFieldValidator<String> validator,
+    int maxLines = 1,
   }) {
     return TextFormField(
       initialValue: initialValue,
       style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+      maxLines: maxLines,
+      minLines: 1,
       decoration: InputDecoration(
         labelText: label,
+        alignLabelWithHint: maxLines > 1,
         labelStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
         prefixIcon: Icon(icon, color: const Color(0xFF1E3A8A).withOpacity(0.5), size: 22),
         filled: true,

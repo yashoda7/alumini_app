@@ -10,7 +10,7 @@ class SaveUserProfileUseCase {
     required String department,
     required String year,
     String? areaOfInterest,
-    String? presentTechnologies,
+    String? bio,
     String? yearsOfExperience,
   }) => _repo.saveUserProfile(
         uid: uid,
@@ -18,7 +18,7 @@ class SaveUserProfileUseCase {
         department: department,
         year: year,
         areaOfInterest: areaOfInterest,
-        presentTechnologies: presentTechnologies,
+        bio: bio,
         yearsOfExperience: yearsOfExperience,
       );
 }

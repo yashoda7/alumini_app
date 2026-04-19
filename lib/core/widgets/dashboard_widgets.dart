@@ -4,12 +4,14 @@ class DashboardHeader extends StatelessWidget {
   final String title;
   final String greeting;
   final VoidCallback? onLogout;
+  final VoidCallback? onProfileTap;
 
   const DashboardHeader({
     super.key,
     required this.title,
     required this.greeting,
     this.onLogout,
+    this.onProfileTap,
   });
 
   @override
@@ -40,23 +42,30 @@ class DashboardHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.white24,
-                    child: Icon(Icons.person, color: Colors.white, size: 24),
+              InkWell(
+                onTap: onProfileTap,
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.white24,
+                        child: Icon(Icons.person, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        greeting,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    greeting,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                ),
               ),
               if (onLogout != null)
                 Container(
@@ -388,4 +397,3 @@ class ModernListTile extends StatelessWidget {
     );
   }
 }
-

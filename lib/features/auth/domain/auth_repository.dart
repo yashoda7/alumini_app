@@ -27,7 +27,7 @@ abstract class AuthRepository {
     required String department,
     required String year,
     String? areaOfInterest,
-    String? presentTechnologies,
+    String? bio,
     String? yearsOfExperience,
   });
 }

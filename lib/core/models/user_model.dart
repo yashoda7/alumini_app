@@ -10,7 +10,7 @@ class AppUser {
     this.department,
     this.year,
     this.areaOfInterest,
-    this.presentTechnologies,
+    this.bio,
     this.yearsOfExperience,
     this.isProfileComplete = false,
     required this.createdAt,
@@ -26,7 +26,7 @@ class AppUser {
   final String? department;
   final String? year;
   final String? areaOfInterest;
-  final String? presentTechnologies;
+  final String? bio;
   final String? yearsOfExperience;
 
   /// false  → route to ProfileCompletionScreen
@@ -46,7 +46,7 @@ class AppUser {
     String? department,
     String? year,
     String? areaOfInterest,
-    String? presentTechnologies,
+    String? bio,
     String? yearsOfExperience,
     bool? isProfileComplete,
   }) {
@@ -60,7 +60,7 @@ class AppUser {
       department: department ?? this.department,
       year: year ?? this.year,
       areaOfInterest: areaOfInterest ?? this.areaOfInterest,
-      presentTechnologies: presentTechnologies ?? this.presentTechnologies,
+      bio: bio ?? this.bio,
       yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
     );
@@ -76,7 +76,7 @@ class AppUser {
       'department': department,
       'year': year,
       'areaOfInterest': areaOfInterest,
-      'presentTechnologies': presentTechnologies,
+      'bio': bio,
       'yearsOfExperience': yearsOfExperience,
       'isProfileComplete': isProfileComplete,
       'createdAt': Timestamp.fromDate(createdAt),
@@ -106,7 +106,7 @@ class AppUser {
       department: data['department'] as String?,
       year: data['year'] as String?,
       areaOfInterest: data['areaOfInterest'] as String?,
-      presentTechnologies: data['presentTechnologies'] as String?,
+      bio: data['bio'] as String?,
       yearsOfExperience: data['yearsOfExperience'] as String?,
       isProfileComplete: (data['isProfileComplete'] as bool?) ?? false,
       createdAt: createdAt,

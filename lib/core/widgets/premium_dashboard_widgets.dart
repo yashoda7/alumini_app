@@ -5,12 +5,14 @@ class PremiumDashboardHeader extends StatelessWidget {
   final String title;
   final String greeting;
   final VoidCallback? onLogout;
+  final VoidCallback? onProfileTap;
 
   const PremiumDashboardHeader({
     super.key,
     required this.title,
     required this.greeting,
     this.onLogout,
+    this.onProfileTap,
   });
 
   @override
@@ -74,18 +76,21 @@ class PremiumDashboardHeader extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                         Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white24, width: 1.5),
-                            shape: BoxShape.circle,
+                         GestureDetector(
+                           onTap: onProfileTap,
+                           child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white24, width: 1.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.white12,
+                              child: Icon(Icons.person_rounded, color: Colors.white, size: 24),
+                            ),
                           ),
-                          child: const CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.white12,
-                            child: Icon(Icons.person_rounded, color: Colors.white, size: 24),
-                          ),
-                        ),
+                         ),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,79 +363,6 @@ class PremiumGridCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class PremiumBottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
-
-  const PremiumBottomNavBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(0, Icons.grid_view_rounded, "Home"),
-          _buildNavItem(1, Icons.event_note_rounded, "Events"),
-          _buildNavItem(2, Icons.person_rounded, "Profile"),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    bool isSelected = currentIndex == index;
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.indigo.withOpacity(0.2) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.indigoAccent : Colors.white60,
-              size: 24,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ],
           ],
         ),
       ),
