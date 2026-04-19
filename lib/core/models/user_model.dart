@@ -9,6 +9,9 @@ class AppUser {
     this.userType,
     this.department,
     this.year,
+    this.areaOfInterest,
+    this.presentTechnologies,
+    this.yearsOfExperience,
     this.isProfileComplete = false,
     required this.createdAt,
   });
@@ -22,6 +25,9 @@ class AppUser {
   final String? userType;
   final String? department;
   final String? year;
+  final String? areaOfInterest;
+  final String? presentTechnologies;
+  final String? yearsOfExperience;
 
   /// false  → route to ProfileCompletionScreen
   /// true   → route to role-specific home screen
@@ -39,6 +45,9 @@ class AppUser {
     String? userType,
     String? department,
     String? year,
+    String? areaOfInterest,
+    String? presentTechnologies,
+    String? yearsOfExperience,
     bool? isProfileComplete,
   }) {
     return AppUser(
@@ -50,6 +59,9 @@ class AppUser {
       userType: userType ?? this.userType,
       department: department ?? this.department,
       year: year ?? this.year,
+      areaOfInterest: areaOfInterest ?? this.areaOfInterest,
+      presentTechnologies: presentTechnologies ?? this.presentTechnologies,
+      yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
     );
   }
@@ -63,6 +75,9 @@ class AppUser {
       'userType': userType,
       'department': department,
       'year': year,
+      'areaOfInterest': areaOfInterest,
+      'presentTechnologies': presentTechnologies,
+      'yearsOfExperience': yearsOfExperience,
       'isProfileComplete': isProfileComplete,
       'createdAt': Timestamp.fromDate(createdAt),
     };
@@ -90,6 +105,9 @@ class AppUser {
       userType: data['userType'] as String?,
       department: data['department'] as String?,
       year: data['year'] as String?,
+      areaOfInterest: data['areaOfInterest'] as String?,
+      presentTechnologies: data['presentTechnologies'] as String?,
+      yearsOfExperience: data['yearsOfExperience'] as String?,
       isProfileComplete: (data['isProfileComplete'] as bool?) ?? false,
       createdAt: createdAt,
     );

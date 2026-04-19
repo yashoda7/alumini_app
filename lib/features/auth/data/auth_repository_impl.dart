@@ -47,11 +47,17 @@ class AuthRepositoryImpl implements AuthRepository {
     required String userType,
     required String department,
     required String year,
+    String? areaOfInterest,
+    String? presentTechnologies,
+    String? yearsOfExperience,
   }) =>
       _firestore.updateUserProfileFields(uid, {
         'userType': userType,
         'department': department,
         'year': year,
+        if (areaOfInterest != null) 'areaOfInterest': areaOfInterest,
+        if (presentTechnologies != null) 'presentTechnologies': presentTechnologies,
+        if (yearsOfExperience != null) 'yearsOfExperience': yearsOfExperience,
         'isProfileComplete': true,
       });
 

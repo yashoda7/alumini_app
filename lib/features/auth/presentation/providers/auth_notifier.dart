@@ -24,6 +24,9 @@ class AuthNotifier extends AsyncNotifier<void> {
     required String userType,
     required String department,
     required String year,
+    String? areaOfInterest,
+    String? presentTechnologies,
+    String? yearsOfExperience,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
@@ -32,6 +35,9 @@ class AuthNotifier extends AsyncNotifier<void> {
             userType: userType,
             department: department,
             year: year,
+            areaOfInterest: areaOfInterest,
+            presentTechnologies: presentTechnologies,
+            yearsOfExperience: yearsOfExperience,
           ),
     );
   }

@@ -9,11 +9,17 @@ class SaveUserProfileUseCase {
     required String userType,
     required String department,
     required String year,
+    String? areaOfInterest,
+    String? presentTechnologies,
+    String? yearsOfExperience,
   }) => _repo.saveUserProfile(
         uid: uid,
         userType: userType,
         department: department,
         year: year,
+        areaOfInterest: areaOfInterest,
+        presentTechnologies: presentTechnologies,
+        yearsOfExperience: yearsOfExperience,
       );
 }
 

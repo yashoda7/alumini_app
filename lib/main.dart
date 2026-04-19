@@ -8,6 +8,7 @@ import 'features/auth/presentation/profile_completion_screen.dart';
 import 'features/home/presentation/alumni_home_screen.dart';
 import 'features/home/presentation/student_home_screen.dart';
 import 'firebase_options.dart';
+import 'features/home/presentation/main_navigation_screen.dart';
 import 'providers/app_providers.dart';
 
 Future<void> main() async {
@@ -64,9 +65,8 @@ class AuthGate extends ConsumerWidget {
               return ProfileCompletionScreen(uid: user.uid);
             }
 
-            // Route by role
-            if (user.isAlumni) return const AlumniHomeScreen();
-            return const StudentHomeScreen();
+            // Route to main navigation (which contains home, events, profile)
+            return const MainNavigationScreen();
           },
         );
       },

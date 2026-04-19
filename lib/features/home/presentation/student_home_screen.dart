@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../providers/app_providers.dart';
-import '../../../core/widgets/dashboard_widgets.dart';
+import '../../../core/widgets/premium_dashboard_widgets.dart';
 import '../../announcements/presentation/announcement_list_screen.dart';
 import '../../directory/presentation/alumni_directory_screen.dart';
 import '../../events/presentation/event_list_screen.dart';
@@ -16,17 +16,22 @@ import '../../events/domain/event_model.dart';
 import '../../jobs/domain/job_model.dart';
 import '../../announcements/domain/announcement_model.dart';
 
-class StudentHomeScreen extends ConsumerWidget {
+class StudentHomeScreen extends ConsumerStatefulWidget {
   const StudentHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StudentHomeScreen> createState() => _StudentHomeScreenState();
+}
+
+class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(currentUserProvider).value;
     final authService = ref.read(authServiceProvider);
     final firestoreService = ref.watch(firestoreServiceProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       body: RefreshIndicator(
         onRefresh: () async {
           await Future.delayed(const Duration(seconds: 1));
@@ -35,8 +40,8 @@ class StudentHomeScreen extends ConsumerWidget {
           physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           slivers: [
             SliverToBoxAdapter(
-              child: DashboardHeader(
-                title: "Discover what's happening today.",
+              child: PremiumDashboardHeader(
+                title: "Discover what's\nhappening today",
                 greeting: "Hi, ${user?.name?.split(' ').first ?? 'Student'}",
                 onLogout: () async {
                   final ok = await confirmDialog(
@@ -50,133 +55,204 @@ class StudentHomeScreen extends ConsumerWidget {
                 },
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
-            
-            // Quick Actions (Horizontal Strip)
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: 130,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: [
-                    QuickActionCard(
-                      icon: Icons.person_outline,
-                      title: 'My Profile',
-                      color: Colors.purple.shade500,
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
-                    ),
-                    QuickActionCard(
-                      icon: Icons.people_outline,
-                      title: 'Alumni Dir',
-                      color: Colors.orange.shade500,
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlumniDirectoryScreen())),
-                    ),
-                    QuickActionCard(
-                      icon: Icons.forum_outlined,
-                      title: 'Forums',
-                      color: Colors.pink.shade500,
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ForumListScreen(canPost: true))),
-                    ),
-                  ],
-                ),
-              ),
-            ),
             
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
 
-            // BENTO BOX GRID
+            // Quick Actions (Horizontal)
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  children: [
-                    // BLOCK A: Large Wide Card (Events)
-                    StreamBuilder<List<AppEvent>>(
-                      stream: firestoreService.watchEvents(),
-                      builder: (context, snapshot) {
-                        final events = snapshot.data ?? [];
-                        final nextEvent = events.isNotEmpty ? events.first : null;
-                        
-                        return BentoCard(
-                          isLarge: true,
-                          icon: Icons.event,
-                          title: nextEvent?.title ?? 'No Upcoming Events',
-                          subtitle: nextEvent != null ? '${nextEvent.location} • Tap to view' : 'Stay tuned for new tech meetups',
-                          dynamicData: nextEvent != null ? 'UPCOMING EVENT' : '',
-                          baseColor: Colors.blue,
-                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EventListScreen(canCreate: false))),
-                        );
-                      }
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // BLOCK B & C: Half width squares (Jobs & Resources)
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: StreamBuilder<List<JobPost>>(
-                              stream: firestoreService.watchJobs(),
-                              builder: (context, snapshot) {
-                                final jobs = snapshot.data ?? [];
-                                final matches = jobs.where((j) => j.description.toLowerCase().contains((user?.department ?? '').toLowerCase())).length;
-                                
-                                return BentoCard(
-                                  icon: Icons.work_outline,
-                                  title: 'Career & Jobs',
-                                  subtitle: jobs.isNotEmpty ? 'Connect with top tier alumni companies' : 'Find your path',
-                                  dynamicData: matches > 0 ? '$matches MATCHES' : (jobs.isNotEmpty ? '${jobs.length} JOBS' : ''),
-                                  baseColor: Colors.amber.shade700,
-                                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const JobListScreen(canPost: false))),
-                                );
-                              }
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: BentoCard(
-                              icon: Icons.folder_open,
-                              title: 'Resource Library',
-                              subtitle: 'Access study guides & templates',
-                              dynamicData: 'TRENDING',
-                              baseColor: Colors.teal,
-                              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ResourceListScreen(canUpload: false))),
-                            ),
-                          ),
-                        ],
+              child: FadeIn(
+                delay: const Duration(milliseconds: 200),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      PremiumQuickActionCard(
+                        icon: Icons.person_rounded,
+                        title: "My Profile",
+                        color: Colors.indigo,
+                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileScreen())),
                       ),
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    // BLOCK D: Large Wide Card (Notice Board)
-                    StreamBuilder<List<Announcement>>(
-                      stream: firestoreService.watchAnnouncements(),
-                      builder: (context, snapshot) {
-                        final notices = snapshot.data ?? [];
-                        final latest = notices.isNotEmpty ? notices.first : null;
-                        
-                        return BentoCard(
-                          isLarge: true,
-                          icon: Icons.campaign_outlined,
-                          title: latest?.title ?? 'Notice Board',
-                          subtitle: latest != null ? 'Tap to view announcement details' : 'No new notices',
-                          dynamicData: latest != null ? 'LATEST UPDATE' : '',
-                          baseColor: Colors.redAccent,
-                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AnnouncementListScreen(canPost: false))),
-                        );
-                      }
-                    ),
-                  ],
+                      PremiumQuickActionCard(
+                        icon: Icons.people_alt_rounded,
+                        title: "Alumni Dir",
+                        color: Colors.orange,
+                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlumniDirectoryScreen())),
+                      ),
+                      PremiumQuickActionCard(
+                        icon: Icons.forum_rounded,
+                        title: "Forums",
+                        color: Colors.pink,
+                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ForumListScreen(canPost: true))),
+                      ),
+                      PremiumQuickActionCard(
+                        icon: Icons.grid_view_rounded,
+                        title: "More",
+                        color: Colors.teal,
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            
-            const SliverToBoxAdapter(child: SizedBox(height: 48)),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 40)),
+
+            // Upcoming Events Section
+            SliverToBoxAdapter(
+              child: FadeIn(
+                delay: const Duration(milliseconds: 400),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: StreamBuilder<List<AppEvent>>(
+                    stream: firestoreService.watchEvents(),
+                    builder: (context, snapshot) {
+                      final events = snapshot.data ?? [];
+                      final nextEvent = events.isNotEmpty ? events.first : null;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Upcoming Event",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (nextEvent != null)
+                            PremiumEventCard(
+                              tag: "Upcoming",
+                              title: nextEvent.title,
+                              location: nextEvent.location,
+                              date: "APR 24",
+                              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EventListScreen(canCreate: false))),
+                            )
+                          else
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(color: Colors.grey.shade200),
+                              ),
+                              child: const Text("No upcoming events scheduled."),
+                            ),
+                        ],
+                      );
+                    }
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 40)),
+
+            // Career & Resources Grid
+            SliverToBoxAdapter(
+              child: FadeIn(
+                delay: const Duration(milliseconds: 600),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: PremiumGridCard(
+                          icon: Icons.work_rounded,
+                          title: "Career & Jobs",
+                          description: "Find matches and careers",
+                          baseColor: Colors.amber.shade800,
+                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const JobListScreen(canPost: false))),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: PremiumGridCard(
+                          icon: Icons.library_books_rounded,
+                          title: "Resources",
+                          description: "Access templates & guides",
+                          baseColor: Colors.blueAccent,
+                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ResourceListScreen(canUpload: false))),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 40)),
+
+            // Latest Updates Section
+            SliverToBoxAdapter(
+              child: FadeIn(
+                delay: const Duration(milliseconds: 800),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Latest Updates",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AnnouncementListScreen(canPost: false))),
+                            child: const Text("View All"),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      StreamBuilder<List<Announcement>>(
+                        stream: firestoreService.watchAnnouncements(),
+                        builder: (context, snapshot) {
+                          final notices = snapshot.data ?? [];
+                          if (notices.isEmpty) {
+                            return const Center(child: Text("No updates yet."));
+                          }
+                          return Column(
+                            children: notices.take(3).map((n) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Text(
+                                      n.title,
+                                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                                    ),
+                                    // subtitle: Text(
+                                    //   n.content,
+                                    //   maxLines: 1,
+                                    //   overflow: TextOverflow.ellipsis,
+                                    // ),
+                                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
+                                    onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AnnouncementListScreen(canPost: false))),
+                                  ),
+                                  const Divider(height: 1),
+                                ],
+                              ),
+                            )).toList(),
+                          );
+                        }
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 120)),
           ],
         ),
       ),

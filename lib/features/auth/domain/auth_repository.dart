@@ -20,11 +20,15 @@ abstract class AuthRepository {
   Future<AppUser?> getUser(String uid);
 
   /// Saves the profile-completion fields and flips [isProfileComplete] to true.
+
   Future<void> saveUserProfile({
     required String uid,
     required String userType,
     required String department,
     required String year,
+    String? areaOfInterest,
+    String? presentTechnologies,
+    String? yearsOfExperience,
   });
 }
 
