@@ -61,7 +61,7 @@ class PremiumDashboardHeader extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
+            Padding(
             padding: EdgeInsets.fromLTRB(
               24, 
               MediaQuery.of(context).padding.top + 20, 
